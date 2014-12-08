@@ -1,5 +1,7 @@
-describe AstBuilder do
-  describe 'structure' do
+describe Ast::Builder do
+  it 'reads in tokens from the text input via the Lexer'
+
+  describe 'structures the tokens' do
     it 'is a kind of array'
     it 'starts as an empty array'
     it 'contains exactly 3 arrays'
@@ -24,10 +26,7 @@ describe AstBuilder do
     end
   end
 
-  describe 'alpha-substitution phase' do
-    it 'clarifies scope by rebinding variables'
-    it 'detaches free token trees'
-  end
+  it 'uses the alpha-substituter to clarify scope'
 
   describe 'joining to previous input' do
     context 'existing AST' do
