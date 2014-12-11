@@ -1,6 +1,4 @@
-describe Ast::Builder do
-  it 'reads in tokens from the text input via the Lexer'
-
+describe Lex::Target do
   describe 'structures the tokens' do
     it 'is a kind of array'
     it 'starts as an empty array'
