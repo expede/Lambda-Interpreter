@@ -1,21 +1,19 @@
 # encoding: utf-8
-# Main class; frames program
-# Reads in string and presents output
+# A lambda-expression (including recursive sub-expression)
 class Expression
   attr_accessor :parameters,
                 :body,
                 :arguments
 
-  def initialize(raw:)
-    ast = Lex.call(raw: raw)
+  def initialize(ast:)
     @parameters = ast[0]
     @body       = ast[1]
     @arguments  = ast[2]
   end
-  
+
   def add_argument!(raw:)
-    new_argument = Lex.call(raw: raw, taken_variables: variables)
-    @arguments << new_argument
+    new_argument = Lex.call(raw: raw, next_variable: next_variable)
+    @arguments.concat(new_argument)
   end
 
   def apply!
@@ -38,10 +36,21 @@ class Expression
     "(#{ parameters }#{ body } #{ arguments })"
   end
 
+  private
+  
   def variables
     argument_vars = @arguments.map(&:variables)
     body_vars = @body.map { |node| node.kind_of?(String) ? node : node.variables }
     
-    @parameters.concat(argument_vars).concat(body_vars).flatten.uniq
+    @parameters.concat(argument_vars).concat(body_vars).flatten.uniq.sort
+  end
+
+  def next_variable
+    # Only able to handle 'a' to 'Z'
+    last = variables.last
+    fail 'Out of variable space' if last == 'Z'
+    return 'a' unless last
+    return 'A' if last == 'z'
+    last.next
   end
 end
