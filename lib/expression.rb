@@ -5,16 +5,33 @@ class Expression
                 :body,
                 :arguments
 
-  def initialize(ast:)
-    @parameters = ast[0]
-    @body       = ast[1]
-    @arguments  = ast[2]
+  @@root = nil
+  
+  def initialize(raw_string:)
+    param_end = (raw_string[0] =~ /[\\λ]/) ? raw_string.find_index('.')
+    rest = Lex::Branch.call(string: raw_string[(params_end + 1 || 0)..-1])
+    space_index = rest.find_index(' ')
+    
+    @parameters = param_end.nil?          ? [] : raw_string[1..(param_end - 1)]
+    @body       = space_index.try(:zero?) ? [] : rest[0..(space_index - 1)]
+    @arguments  = space_index.nil?        ? [] : rest[(space_index + 1)..-1]
   end
 
-  def add_argument!(raw:)
-    new_argument = Lex.call(raw: raw, next_variable: next_variable)
-    @arguments.concat(new_argument)
+  def root?
+    self == @@root
   end
+  
+  def root!
+    @@root = self
+  end
+  
+  # @note No keyword argument
+  def <<(raw_argument)
+    @arguments << Expression.new(raw: raw_argument)
+    raw.concat(raw)
+  end
+
+  alias_method :add_argument!, :<<
 
   def apply!
     @body.map! { |node| (node == @parameters.first) ? @arguments.first : node }
@@ -24,33 +41,15 @@ class Expression
   end
 
   def reduce!
-    apply! until parameters.empty? || arguments.empty?
+    apply! until @parameters.empty? || @arguments.empty?
     body.each { |node| node.reduce! if node.kind_of? Expression }
   end
   
   def to_s
-    parameters = "λ{ parameters.join }." unless parameters.empty?
-    body       = body.map(&:to_s).join
-    arguments  = arguments.map { |arg| "(#{ arg })" }.join
-    # Top-level should remove parens
-    "(#{ parameters }#{ body } #{ arguments })"
-  end
-
-  private
-  
-  def variables
-    argument_vars = @arguments.map(&:variables)
-    body_vars = @body.map { |node| node.kind_of?(String) ? node : node.variables }
-    
-    @parameters.concat(argument_vars).concat(body_vars).flatten.uniq.sort
-  end
-
-  def next_variable
-    # Only able to handle 'a' to 'Z'
-    last = variables.last
-    fail 'Out of variable space' if last == 'Z'
-    return 'a' unless last
-    return 'A' if last == 'z'
-    last.next
+    parameters  = "λ{ parameters.join }." unless parameters.empty?
+    body        = body.map(&:to_s).join
+    arguments   = arguments.map { |arg| "(#{ arg })" }.join
+    stringified = "#{ parameters }#{ body } #{ arguments }"
+    root? ? stringified : "(#{ stringified })"
   end
 end
