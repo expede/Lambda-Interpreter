@@ -12,9 +12,9 @@ class Expression
     rest = Lex::Branch.call(string: raw_string[(params_end + 1 || 0)..-1])
     space_index = rest.find_index(' ')
 
-    @parameters = param_end        ? raw_string[1..(param_end - 1)] : []
-    @body       = space_index != 0 ? rest[0..(space_index - 1)]     : []
-    @arguments  = space_index      ? rest[(space_index + 1)..-1]    : []
+    @parameters = param_end ? raw_string[1..(param_end - 1)] : []
+    @body       = !space_index.try(:zero?) ? rest[0..(space_index - 1)] : []
+    @arguments  = space_index ? rest[(space_index + 1)..-1] : []
   end
 
   def root?
