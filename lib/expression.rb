@@ -5,26 +5,26 @@ class Expression
                 :body,
                 :arguments
 
-  @@root = nil
-  
+  @@root ||= nil
+
   def initialize(raw_string:)
-    param_end = (raw_string[0] =~ /[\\λ]/) ? raw_string.find_index('.')
+    param_end = raw_string.find_index('.') if (raw_string[0] =~ /[\\λ]/)
     rest = Lex::Branch.call(string: raw_string[(params_end + 1 || 0)..-1])
     space_index = rest.find_index(' ')
-    
-    @parameters = param_end.nil?          ? [] : raw_string[1..(param_end - 1)]
-    @body       = space_index.try(:zero?) ? [] : rest[0..(space_index - 1)]
-    @arguments  = space_index.nil?        ? [] : rest[(space_index + 1)..-1]
+
+    @parameters = param_end        ? raw_string[1..(param_end - 1)] : []
+    @body       = space_index != 0 ? rest[0..(space_index - 1)]     : []
+    @arguments  = space_index      ? rest[(space_index + 1)..-1]    : []
   end
 
   def root?
     self == @@root
   end
-  
+
   def root!
     @@root = self
   end
-  
+
   # @note No keyword argument
   def <<(raw_argument)
     @arguments << Expression.new(raw: raw_argument)
@@ -44,7 +44,7 @@ class Expression
     apply! until @parameters.empty? || @arguments.empty?
     body.each { |node| node.reduce! if node.kind_of? Expression }
   end
-  
+
   def to_s
     parameters  = "λ{ parameters.join }." unless parameters.empty?
     body        = body.map(&:to_s).join
