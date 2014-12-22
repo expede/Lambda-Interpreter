@@ -1,19 +1,11 @@
-# coding: utf-8
+require 'spec_helper'
+
 describe LambdaInterpreter do
-  # :: String
-  # -> [[char (uniq)], [[sub-expression]], [[sub-expression]]]
-  # -> [sub-expression]
+  it 'has a version number' do
+    expect(LambdaInterpreter::VERSION).not_to be nil
+  end
 
-  describe 'I/O loop' do
-    describe 'input' do
-      it 'prompts for input'
-      it 'reads in text once the `return` key is pressed'
-      it 'provides helpful error messages about malformed input'
-    end
-
-    describe 'output' do
-      it 'prints the latest reduced lambda expression to the console'
-      it 'starts the loop again'
-    end
+  it 'does something useful' do
+    expect(false).to eq(true)
   end
 end
