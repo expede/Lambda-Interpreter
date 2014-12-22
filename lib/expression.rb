@@ -7,6 +7,11 @@ class Expression
 
   @@root ||= nil
 
+  def self.reduce!
+    fail 'No root' unless @@root
+    @@root.reduce!
+  end
+  
   def initialize(raw_string:)
     param_end = raw_string.find_index('.') if (raw_string[0] =~ /[\\λ]/)
     rest = Lex::Branch.call(string: raw_string[(params_end + 1 || 0)..-1])
@@ -43,6 +48,7 @@ class Expression
   def reduce!
     apply! until @parameters.empty? || @arguments.empty?
     body.each { |node| node.reduce! if node.kind_of? Expression }
+    self = Expression.new(to_s) if @@root.parameters.empty?
   end
 
   def to_s
