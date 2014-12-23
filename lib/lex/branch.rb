@@ -6,15 +6,15 @@ module Lex
     def self.call(raw:)
       Lex::Branch.new(raw: raw).expression
     end
-                
+
     def initialize(raw:)
       @skipover   = 0
       @expression = []
-      build!(raw_array: raw)
+      build!(raw_array: raw.chars)
     end
 
     private
-    
+
     def build!(raw_array:)
       raw_array.each.with_index do |element, index|
         return sprout_branch!(from_index: index) if element == '('
