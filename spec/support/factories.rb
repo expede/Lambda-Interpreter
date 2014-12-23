@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-# require_relative '../spec_helper'
 
 FactoryGirl.define do
-  factory :input_string do
+  factory(:input_string) do
     skip_create
 
     parameters do
@@ -37,7 +36,10 @@ FactoryGirl.define do
     end
   end
 
-  factory(:expression) do
+  factory(Model::Expression) do
+    skip_create
+    initialize_with { new(raw_string: '') }
+
     parameters do
       ('a'..'z').to_a
                 .sample(rand(0..9))
@@ -64,6 +66,18 @@ FactoryGirl.define do
       args
     end
 
-    initialize_with { new(raw_string: '') }
+    trait(:no_subexpressions) do
+      body do
+        body = []
+        rand(1..9).times { body << ('a'..'z').to_a.sample }
+        body
+      end
+
+      arguments do
+        args = []
+        rand(1..9).times { args << ('a'..'z').to_a.sample }
+        args
+      end
+    end
   end
 end
