@@ -2,10 +2,10 @@ source 'https://rubygems.org'
 
 # Tests
 gem 'rspec',              '~> 3.1'
-gem 'rspec-its',          '~> 1.1'
+# gem 'rspec-its',          '~> 1.1'
 gem 'factory_girl',       '~> 4.5'
 gem 'factory_girl_rspec', '~> 2.1'
-gem 'faker',              '~> 1.4'
+# gem 'faker',              '~> 1.4'
 gem 'simplecov',          '~> 0.8'
 
 # Quality of life
